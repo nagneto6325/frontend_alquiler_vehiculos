@@ -1,0 +1,263 @@
+<!-- Componente de gestión de contratos -->
+<div class="gestion-contratos">
+    <!-- Encabezado -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="text-dark fw-bold mb-1">Gestión de Contratos</h4>
+            <p class="text-muted mb-0">Administre los contratos de alquiler de vehículos</p>
+        </div>
+        <button class="btn btn-primary" (click)="abrirModalNuevo()" [disabled]="cargando">
+            <i class="fas fa-file-contract me-2"></i>Nuevo Contrato
+        </button>
+    </div>
+
+    <!-- Mensajes -->
+    <div *ngIf="mensaje" 
+         class="alert alert-dismissible fade show" 
+         [class.alert-success]="!mensaje.includes('Error')"
+         [class.alert-danger]="mensaje.includes('Error')"
+         role="alert">
+        {{ mensaje }}
+        <button type="button" class="btn-close" (click)="mensaje = ''"></button>
+    </div>
+
+    <!-- Tarjetas de resumen -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stats-label">Total Contratos</div>
+                            <div class="stats-value">{{ contratos.length }}</div>
+                        </div>
+                        <i class="fas fa-file-contract fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stats-label">Contratos Activos</div>
+                            <div class="stats-value">
+                                {{ obtenerContratosActivos() }}
+                            </div>
+                        </div>
+                        <i class="fas fa-play-circle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stats-label">Contratos Pagados</div>
+                            <div class="stats-value">
+                                {{ obtenerContratosPagados() }}
+                            </div>
+                        </div>
+                        <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stats-label">Ingresos Totales</div>
+                            <div class="stats-value">
+                                ${{ obtenerIngresosTotales() | number }}
+                            </div>
+                        </div>
+                        <i class="fas fa-dollar-sign fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de contratos -->
+    <div class="card">
+        <div class="card-header bg-white">
+            <h5 class="card-title mb-0">Lista de Contratos</h5>
+        </div>
+        <div class="card-body">
+            <div *ngIf="cargando && contratos.length === 0" class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="text-muted mt-2">Cargando contratos...</p>
+            </div>
+
+            <div *ngIf="!cargando && contratos.length === 0" class="text-center py-4">
+                <i class="fas fa-file-contract fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No hay contratos registrados</p>
+                <button class="btn btn-primary" (click)="abrirModalNuevo()">
+                    <i class="fas fa-file-contract me-2"></i>Crear Primer Contrato
+                </button>
+            </div>
+
+            <div *ngIf="contratos.length > 0" class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Cliente</th>
+                            <th scope="col">Vehículo</th>
+                            <th scope="col">Horas</th>
+                            <th scope="col">Total</th>
+                            <th scope="col">Estado</th>
+                            <th scope="col">Fecha Inicio</th>
+                            <th scope="col" class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let contrato of contratos">
+                            <td class="fw-semibold">{{ obtenerNombreCliente(contrato.cliente_id) }}</td>
+                            <td>{{ obtenerNombreVehiculo(contrato.vehiculo_id) }}</td>
+                            <td class="text-center">{{ contrato.horas_contratadas }}</td>
+                            <td class="fw-bold text-success">${{ contrato.precio_total | number }}</td>
+                            <td>
+                                <span class="badge" [ngClass]="obtenerClaseEstado(contrato)">
+                                    {{ obtenerTextoEstado(contrato) }}
+                                </span>
+                            </td>
+                            <td class="text-muted">{{ formatearFecha(contrato.fecha_inicio) }}</td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary" 
+                                            (click)="abrirModalEditar(contrato)"
+                                            title="Editar contrato">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger" 
+                                            (click)="eliminarContrato(contrato.id)"
+                                            title="Eliminar contrato">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para crear/editar contrato -->
+<div class="modal fade" [class.show]="mostrarModal" [style.display]="mostrarModal ? 'block' : 'none'" 
+     tabindex="-1" role="dialog" [attr.aria-hidden]="!mostrarModal">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    {{ contratoSeleccionado ? 'Editar Contrato' : 'Nuevo Contrato' }}
+                </h5>
+                <button type="button" class="btn-close" (click)="cerrarModal()" [disabled]="cargando"></button>
+            </div>
+            <div class="modal-body">
+                <form (ngSubmit)="guardarContrato()" #contratoForm="ngForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="cliente_id" class="form-label">Cliente</label>
+                            <select class="form-control" id="cliente_id"
+                                    [(ngModel)]="contratoSeleccionado ? contratoSeleccionado.cliente_id : nuevoContrato.cliente_id"
+                                    name="cliente_id" required>
+                                <option value="">Seleccionar cliente</option>
+                                <option *ngFor="let cliente of clientes" [value]="cliente.id">
+                                    {{ cliente.nombre }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="vehiculo_id" class="form-label">Vehículo</label>
+                            <select class="form-control" id="vehiculo_id"
+                                    [(ngModel)]="contratoSeleccionado ? contratoSeleccionado.vehiculo_id : nuevoContrato.vehiculo_id"
+                                    name="vehiculo_id" 
+                                    (change)="onVehiculoSeleccionado($any($event.target).value)"
+                                    required>
+                                <option value="">Seleccionar vehículo</option>
+                                <option *ngFor="let vehiculo of vehiculos" [value]="vehiculo.id">
+                                    {{ vehiculo.nombre }} - ${{ vehiculo.tarifa_hora | number }}/hora
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="horas_contratadas" class="form-label">Horas Contratadas</label>
+                            <input type="number" class="form-control" id="horas_contratadas"
+                                   [(ngModel)]="contratoSeleccionado ? contratoSeleccionado.horas_contratadas : nuevoContrato.horas_contratadas"
+                                   name="horas_contratadas" min="1" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="precio_por_hora" class="form-label">Precio por Hora (COP)</label>
+                            <input type="number" class="form-control" id="precio_por_hora"
+                                   [(ngModel)]="contratoSeleccionado ? contratoSeleccionado.precio_por_hora : nuevoContrato.precio_por_hora"
+                                   name="precio_por_hora" min="0" step="1000" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+                            <input type="datetime-local" class="form-control" id="fecha_inicio"
+                                   [(ngModel)]="contratoSeleccionado ? contratoSeleccionado.fecha_inicio : nuevoContrato.fecha_inicio"
+                                   name="fecha_inicio" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="fecha_fin_estimada" class="form-label">Fecha Fin Estimada</label>
+                            <input type="datetime-local" class="form-control" id="fecha_fin_estimada"
+                                   [(ngModel)]="contratoSeleccionado ? contratoSeleccionado.fecha_fin_estimada : nuevoContrato.fecha_fin_estimada"
+                                   name="fecha_fin_estimada" required>
+                        </div>
+
+                        <div class="col-12 mb-3" *ngIf="contratoSeleccionado">
+                            <label for="fecha_fin_real" class="form-label">Fecha Fin Real (Opcional)</label>
+                            <input type="datetime-local" class="form-control" id="fecha_fin_real"
+                                   [(ngModel)]="contratoSeleccionado.fecha_fin_real"
+                                   name="fecha_fin_real">
+                        </div>
+
+                        <div class="col-12 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="pagado"
+                                       [(ngModel)]="contratoSeleccionado ? contratoSeleccionado.pagado : nuevoContrato.pagado"
+                                       name="pagado">
+                                <label class="form-check-label" for="pagado">
+                                    Contrato pagado
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <strong>Precio Total Calculado:</strong> 
+                                ${{ calcularPrecioTotal() | number }} COP
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="cerrarModal()" [disabled]="cargando">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" (click)="guardarContrato()" [disabled]="cargando">
+                    <span *ngIf="cargando" class="spinner-border spinner-border-sm me-2"></span>
+                    {{ contratoSeleccionado ? 'Actualizar' : 'Crear' }} Contrato
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Overlay para modal -->
+<div class="modal-backdrop fade show" *ngIf="mostrarModal" (click)="cerrarModal()"></div>

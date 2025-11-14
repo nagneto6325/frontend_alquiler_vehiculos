@@ -1,0 +1,231 @@
+<!-- Componente de reportes y estadísticas -->
+<div class="reportes">
+    <!-- Encabezado -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="text-dark fw-bold mb-1">Reportes y Estadísticas</h4>
+            <p class="text-muted mb-0">Análisis y métricas del sistema de alquiler</p>
+        </div>
+        
+        <!-- Filtros de fecha -->
+        <div class="d-flex gap-2 align-items-center">
+            <div>
+                <label for="fechaInicio" class="form-label small mb-1">Desde</label>
+                <input type="date" class="form-control form-control-sm" id="fechaInicio"
+                       [(ngModel)]="rangoFechas.inicio">
+            </div>
+            <div>
+                <label for="fechaFin" class="form-label small mb-1">Hasta</label>
+                <input type="date" class="form-control form-control-sm" id="fechaFin"
+                       [(ngModel)]="rangoFechas.fin">
+            </div>
+            <button class="btn btn-primary btn-sm mt-3" 
+                    (click)="actualizarReportes()"
+                    [disabled]="cargando">
+                <i class="fas fa-sync-alt me-1"></i>Actualizar
+            </button>
+        </div>
+    </div>
+
+    <!-- Mensajes -->
+    <div *ngIf="mensaje" 
+         class="alert alert-dismissible fade show" 
+         [class.alert-success]="!mensaje.includes('Error') && !mensaje.includes('implementada')"
+         [class.alert-info]="mensaje.includes('implementada')"
+         [class.alert-danger]="mensaje.includes('Error')"
+         role="alert">
+        {{ mensaje }}
+        <button type="button" class="btn-close" (click)="mensaje = ''"></button>
+    </div>
+
+    <!-- Tarjetas de resumen -->
+    <div class="row g-3 mb-4" *ngIf="datosReportes.estadisticasBasicas">
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <div class="stats-value-large">{{ datosReportes.estadisticasBasicas.totalVehiculos }}</div>
+                    <div class="stats-label">Total Vehículos</div>
+                    <i class="fas fa-car stats-icon-large"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <div class="stats-value-large">{{ datosReportes.estadisticasBasicas.vehiculosDisponibles }}</div>
+                    <div class="stats-label">Disponibles</div>
+                    <i class="fas fa-check-circle stats-icon-large"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <div class="stats-value-large">{{ datosReportes.estadisticasBasicas.totalContratos }}</div>
+                    <div class="stats-label">Total Contratos</div>
+                    <i class="fas fa-file-contract stats-icon-large"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                    <div class="stats-value-large">{{ datosReportes.estadisticasBasicas.contratosActivos }}</div>
+                    <div class="stats-label">Contratos Activos</div>
+                    <i class="fas fa-play-circle stats-icon-large"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="card bg-danger text-white">
+                <div class="card-body text-center">
+                    <div class="stats-value-large">{{ datosReportes.estadisticasBasicas.ingresosTotales | number }}</div>
+                    <div class="stats-label">Ingresos Totales</div>
+                    <i class="fas fa-dollar-sign stats-icon-large"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="card bg-dark text-white">
+                <div class="card-body text-center">
+                    <div class="stats-value-large">{{ datosReportes.estadisticasBasicas.mantenimientosPendientes }}</div>
+                    <div class="stats-label">Mant. Pendientes</div>
+                    <i class="fas fa-tools stats-icon-large"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficas y visualizaciones -->
+    <div class="row g-3" *ngIf="!cargando && datosReportes.estadisticasBasicas">
+        <!-- Distribución de vehículos -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-pie me-2 text-primary"></i>
+                        Distribución de Vehículos por Tipo
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="graficaVehiculos" width="400" height="300"></canvas>
+                    </div>
+                    <div class="mt-3">
+                        <div *ngFor="let tipo of datosReportes.distribucionVehiculos?.labels; let i = index" 
+                             class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="small">
+                                <span class="badge me-2" 
+                                      [style.backgroundColor]="datosReportes.distribucionVehiculos.colores[i]">
+                                    &nbsp;&nbsp;
+                                </span>
+                                {{ tipo }}
+                            </span>
+                            <span class="fw-bold small">
+                                {{ datosReportes.distribucionVehiculos.datos[i] }} vehículos
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ingresos mensuales -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-line me-2 text-success"></i>
+                        Ingresos Mensuales
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="graficaIngresos" width="400" height="300"></canvas>
+                    </div>
+                    <div class="mt-3 text-center">
+                        <p class="text-muted mb-1">Total acumulado</p>
+                        <h4 class="text-success fw-bold">
+                            {{ formatearMoneda(datosReportes.estadisticasBasicas.ingresosTotales) }}
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estado de contratos -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-bar me-2 text-info"></i>
+                        Estado de Contratos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="graficaContratos" width="400" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Métodos de pago -->
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-doughnut me-2 text-warning"></i>
+                        Métodos de Pago
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="graficaMetodosPago" width="400" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exportación de datos -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-download me-2 text-primary"></i>
+                        Exportación de Datos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">
+                        Exporte los datos del sistema en diferentes formatos para su análisis externo.
+                    </p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-outline-primary" (click)="exportarCSV('vehiculos')">
+                            <i class="fas fa-file-csv me-2"></i>Exportar Vehículos
+                        </button>
+                        <button class="btn btn-outline-success" (click)="exportarCSV('contratos')">
+                            <i class="fas fa-file-csv me-2"></i>Exportar Contratos
+                        </button>
+                        <button class="btn btn-outline-info" (click)="exportarCSV('pagos')">
+                            <i class="fas fa-file-csv me-2"></i>Exportar Pagos
+                        </button>
+                        <button class="btn btn-outline-warning" (click)="exportarCSV('mantenimientos')">
+                            <i class="fas fa-file-csv me-2"></i>Exportar Mantenimientos
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estado de carga -->
+    <div *ngIf="cargando" class="text-center py-5">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="visually-hidden">Cargando reportes...</span>
+        </div>
+        <p class="text-muted mt-3">Cargando datos para reportes...</p>
+    </div>
+</div>

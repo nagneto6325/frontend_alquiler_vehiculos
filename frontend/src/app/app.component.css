@@ -1,0 +1,320 @@
+/**
+ * Estilos principales del componente de aplicación
+ * Define el layout y estilos para la estructura general
+ */
+
+.app-container {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+/* Barra de navegación superior */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+/* Contenedor principal */
+.main-container {
+    display: flex;
+    min-height: 100vh;
+    margin-top: 56px; /* Compensa la altura de la navbar fija */
+}
+
+/* Barra lateral */
+.sidebar {
+    width: 250px;
+    background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+    color: white;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+    position: fixed;
+    top: 56px;
+    left: 0;
+    bottom: 0;
+    overflow-y: auto;
+    z-index: 999;
+    transition: all 0.3s ease;
+}
+
+.sidebar.collapsed {
+    width: 60px;
+}
+
+.sidebar.collapsed .sidebar-header h5,
+.sidebar.collapsed .sidebar-menu span {
+    display: none;
+}
+
+.sidebar.collapsed .sidebar-menu a {
+    text-align: center;
+    padding: 12px 10px;
+}
+
+.sidebar.collapsed .sidebar-menu i {
+    margin-right: 0;
+}
+
+.sidebar-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.toggle-sidebar {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 1.2rem;
+    margin-right: 10px; /* Espacio entre el botón y el texto */
+}
+
+.sidebar-header h5 {
+    margin: 0;
+    flex: 1; /* Ocupa el espacio restante */
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-menu li {
+    margin: 0;
+}
+
+.sidebar-menu a {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+    font-weight: 500;
+}
+
+.sidebar-menu a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left-color: #3498db;
+    color: white;
+}
+
+.sidebar-menu a.active {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-left-color: #e74c3c;
+    color: white;
+    font-weight: 600;
+}
+
+.sidebar-menu i {
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+}
+
+/* Área de contenido */
+.content-area {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+    margin-left: 250px;
+    transition: all 0.3s ease;
+}
+
+.content-area.expanded {
+    margin-left: 60px;
+}
+
+.section-content {
+    animation: fadeIn 0.3s ease-in;
+}
+
+.section-header {
+    margin-bottom: 30px;
+}
+
+.section-header h4 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.section-header p {
+    color: #7f8c8d;
+    margin: 0;
+}
+
+/* Tarjetas de estadísticas */
+.stats-card {
+    border: none;
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.stats-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 5px;
+}
+
+.stats-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.stats-icon {
+    font-size: 2rem;
+    opacity: 0.8;
+}
+
+/* Tarjetas generales */
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.card-header {
+    background-color: white;
+    border-bottom: 1px solid #ecf0f1;
+    padding: 15px 20px;
+}
+
+.card-title {
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Tablas */
+.table {
+    margin-bottom: 0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #2c3e50;
+    background-color: #f8f9fa;
+    padding: 12px 15px;
+}
+
+.table td {
+    vertical-align: middle;
+    padding: 12px 15px;
+}
+
+/* Badges */
+.badge {
+    font-size: 0.75em;
+    padding: 0.4em 0.6em;
+    font-weight: 500;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .main-container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        top: 0;
+    }
+    
+    .sidebar.collapsed {
+        width: 100%;
+    }
+    
+    .sidebar.collapsed .sidebar-header h5,
+    .sidebar.collapsed .sidebar-menu span {
+        display: block;
+    }
+    
+    .sidebar.collapsed .sidebar-menu a {
+        text-align: left;
+        padding: 12px 20px;
+    }
+    
+    .content-area {
+        padding: 15px;
+        margin-left: 0;
+    }
+    
+    .content-area.expanded {
+        margin-left: 0;
+    }
+    
+    .stats-value {
+        font-size: 1.4rem;
+    }
+    
+    .sidebar-menu {
+        display: flex;
+        overflow-x: auto;
+    }
+    
+    .sidebar-menu li {
+        flex-shrink: 0;
+    }
+    
+    .sidebar-menu a {
+        border-left: none;
+        border-bottom: 3px solid transparent;
+        white-space: nowrap;
+    }
+    
+    .sidebar-menu a.active {
+        border-left: none;
+        border-bottom-color: #e74c3c;
+    }
+}
+
+/* Utilidades de espaciado */
+.mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+.g-3 {
+    gap: 1rem;
+}
+
+/* Estados de carga */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
