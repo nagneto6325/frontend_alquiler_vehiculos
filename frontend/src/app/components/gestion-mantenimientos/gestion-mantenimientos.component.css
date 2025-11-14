@@ -1,0 +1,123 @@
+/**
+ * Estilos para el componente de gestión de mantenimientos
+ */
+
+.gestion-mantenimientos {
+    animation: fadeIn 0.3s ease-in;
+}
+
+/* Badges de tipos de mantenimiento */
+.badge.bg-primary { background-color: #007bff !important; }
+.badge.bg-info { background-color: #17a2b8 !important; }
+.badge.bg-warning { 
+    background-color: #ffc107 !important; 
+    color: #212529 !important;
+}
+.badge.bg-danger { background-color: #dc3545 !important; }
+.badge.bg-dark { background-color: #343a40 !important; }
+
+/* Texto pequeño para descripciones */
+.small {
+    font-size: 0.875rem;
+}
+
+/* Costos en rojo para destacar gastos */
+.text-danger {
+    color: #dc3545 !important;
+    font-weight: 600;
+}
+
+/* Textarea para descripciones */
+textarea.form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    padding: 0.75rem;
+    transition: all 0.3s ease;
+    resize: vertical;
+    min-height: 80px;
+}
+
+textarea.form-control:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+/* Estadísticas */
+.stats-card {
+    border: none;
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.stats-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 5px;
+}
+
+.stats-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .stats-value {
+        font-size: 1.4rem;
+    }
+    
+    .modal-dialog {
+        margin: 1rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    .btn-group-sm .btn {
+        padding: 0.2rem 0.4rem;
+    }
+    
+    .small {
+        font-size: 0.8rem;
+    }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Estados de hover en tabla */
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+    transition: background-color 0.2s ease;
+}
+
+/* Campo de fecha completado condicional */
+.conditional-field {
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

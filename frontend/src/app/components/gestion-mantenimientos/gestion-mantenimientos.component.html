@@ -1,0 +1,269 @@
+<!-- Componente de gestión de mantenimientos -->
+<div class="gestion-mantenimientos">
+    <!-- Encabezado -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="text-dark fw-bold mb-1">Gestión de Mantenimientos</h4>
+            <p class="text-muted mb-0">Administre los mantenimientos de los vehículos</p>
+        </div>
+        <button class="btn btn-primary" (click)="abrirModalNuevo()" [disabled]="cargando">
+            <i class="fas fa-tools me-2"></i>Nuevo Mantenimiento
+        </button>
+    </div>
+
+    <!-- Mensajes -->
+    <div *ngIf="mensaje" 
+         class="alert alert-dismissible fade show" 
+         [class.alert-success]="!mensaje.includes('Error')"
+         [class.alert-danger]="mensaje.includes('Error')"
+         role="alert">
+        {{ mensaje }}
+        <button type="button" class="btn-close" (click)="mensaje = ''"></button>
+    </div>
+
+    <!-- Tarjetas de estadísticas -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stats-label">Total Mantenimientos</div>
+                            <div class="stats-value">{{ obtenerEstadisticas().totalMantenimientos }}</div>
+                        </div>
+                        <i class="fas fa-tools fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stats-label">Pendientes</div>
+                            <div class="stats-value">{{ obtenerEstadisticas().mantenimientosPendientes }}</div>
+                        </div>
+                        <i class="fas fa-clock fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stats-label">Completados</div>
+                            <div class="stats-value">{{ obtenerEstadisticas().mantenimientosCompletados }}</div>
+                        </div>
+                        <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="stats-label">Costo Total</div>
+                            <div class="stats-value">${{ (obtenerEstadisticas().costoTotal || 0) | number }}</div>
+                        </div>
+                        <i class="fas fa-dollar-sign fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de mantenimientos -->
+    <div class="card">
+        <div class="card-header bg-white">
+            <h5 class="card-title mb-0">Lista de Mantenimientos</h5>
+        </div>
+        <div class="card-body">
+            <div *ngIf="cargando && mantenimientos.length === 0" class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="text-muted mt-2">Cargando mantenimientos...</p>
+            </div>
+
+            <div *ngIf="!cargando && mantenimientos.length === 0" class="text-center py-4">
+                <i class="fas fa-tools fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No hay mantenimientos registrados</p>
+                <button class="btn btn-primary" (click)="abrirModalNuevo()">
+                    <i class="fas fa-tools me-2"></i>Registrar Primer Mantenimiento
+                </button>
+            </div>
+
+            <div *ngIf="mantenimientos.length > 0" class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Vehículo</th>
+                            <th scope="col">Tipo</th>
+                            <th scope="col">Descripción</th>
+                            <th scope="col">Costo</th>
+                            <th scope="col">Estado</th>
+                            <th scope="col">Fecha Solicitud</th>
+                            <th scope="col" class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let mantenimiento of mantenimientos">
+                            <td class="fw-semibold">{{ obtenerNombreVehiculo(mantenimiento.vehiculo_id) }}</td>
+                            <td>
+                                <span class="badge" [ngClass]="obtenerClaseTipo(mantenimiento.tipo)">
+                                    {{ mantenimiento.tipo }}
+                                </span>
+                            </td>
+                            <td>
+                                <span *ngIf="mantenimiento.descripcion; else sinDescripcion" 
+                                      class="text-muted small">
+                                    {{ mantenimiento.descripcion | slice:0:50 }}
+                                    {{ mantenimiento.descripcion.length > 50 ? '...' : '' }}
+                                </span>
+                                <ng-template #sinDescripcion>
+                                    <span class="text-muted fst-italic small">Sin descripción</span>
+                                </ng-template>
+                            </td>
+                            <td class="fw-bold text-danger">{{ mantenimiento.costo | number }}</td>
+                            <td>
+                                <span class="badge" [ngClass]="obtenerClaseEstado(mantenimiento.estado)">
+                                    {{ mantenimiento.estado }}
+                                </span>
+                            </td>
+                            <td class="text-muted">{{ formatearFecha(mantenimiento.fecha_solicitud) }}</td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary" 
+                                            (click)="abrirModalEditar(mantenimiento)"
+                                            title="Editar mantenimiento">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger" 
+                                            (click)="eliminarMantenimiento(mantenimiento.id)"
+                                            title="Eliminar mantenimiento">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para crear/editar mantenimiento -->
+<div class="modal fade" [class.show]="mostrarModal" [style.display]="mostrarModal ? 'block' : 'none'" 
+     tabindex="-1" role="dialog" [attr.aria-hidden]="!mostrarModal">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    {{ mantenimientoSeleccionado ? 'Editar Mantenimiento' : 'Nuevo Mantenimiento' }}
+                </h5>
+                <button type="button" class="btn-close" (click)="cerrarModal()" [disabled]="cargando"></button>
+            </div>
+            <div class="modal-body">
+                <form (ngSubmit)="guardarMantenimiento()" #mantenimientoForm="ngForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="vehiculo_id" class="form-label">Vehículo</label>
+                            <select class="form-control" id="vehiculo_id"
+                                    [(ngModel)]="mantenimientoSeleccionado ? mantenimientoSeleccionado.vehiculo_id : nuevoMantenimiento.vehiculo_id"
+                                    name="vehiculo_id" required>
+                                <option value="">Seleccionar vehículo</option>
+                                <option *ngFor="let vehiculo of vehiculos" [value]="vehiculo.id">
+                                    {{ vehiculo.nombre }} - {{ vehiculo.tipo }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="contrato_id" class="form-label">Contrato Asociado (Opcional)</label>
+                            <select class="form-control" id="contrato_id"
+                                    [(ngModel)]="mantenimientoSeleccionado ? mantenimientoSeleccionado.contrato_id : nuevoMantenimiento.contrato_id"
+                                    name="contrato_id">
+                                <option value="">Sin contrato asociado</option>
+                                <option *ngFor="let contrato of contratos" [value]="contrato.id">
+                                    {{ contrato.id.slice(0, 8) }}... - {{ obtenerNombreVehiculo(contrato.vehiculo_id) }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="tipo" class="form-label">Tipo de Mantenimiento</label>
+                            <select class="form-control" id="tipo"
+                                    [(ngModel)]="mantenimientoSeleccionado ? mantenimientoSeleccionado.tipo : nuevoMantenimiento.tipo"
+                                    name="tipo" required>
+                                <option *ngFor="let tipo of tiposMantenimiento" [value]="tipo">
+                                    {{ tipo }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="costo" class="form-label">Costo (COP)</label>
+                            <input type="number" class="form-control" id="costo"
+                                   [(ngModel)]="mantenimientoSeleccionado ? mantenimientoSeleccionado.costo : nuevoMantenimiento.costo"
+                                   name="costo" min="0" step="1000" required>
+                        </div>
+
+                        <div class="col-12 mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="descripcion" rows="3"
+                                      [(ngModel)]="mantenimientoSeleccionado ? mantenimientoSeleccionado.descripcion : nuevoMantenimiento.descripcion"
+                                      name="descripcion"
+                                      placeholder="Describa los detalles del mantenimiento..."></textarea>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="fecha_solicitud" class="form-label">Fecha de Solicitud</label>
+                            <input type="datetime-local" class="form-control" id="fecha_solicitud"
+                                   [(ngModel)]="mantenimientoSeleccionado ? mantenimientoSeleccionado.fecha_solicitud : nuevoMantenimiento.fecha_solicitud"
+                                   name="fecha_solicitud" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="estado" class="form-label">Estado</label>
+                            <select class="form-control" id="estado"
+                                    [(ngModel)]="mantenimientoSeleccionado ? mantenimientoSeleccionado.estado : nuevoMantenimiento.estado"
+                                    name="estado" 
+                                    (change)="onEstadoCambio($any($event.target).value)"
+                                    required>
+                                <option *ngFor="let estado of estadosMantenimiento" [value]="estado">
+                                    {{ estado }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 mb-3" 
+                             *ngIf="(mantenimientoSeleccionado ? mantenimientoSeleccionado.estado : nuevoMantenimiento.estado) === 'Completado'">
+                            <label for="fecha_completado" class="form-label">Fecha de Completado</label>
+                            <input type="datetime-local" class="form-control" id="fecha_completado"
+                                   [(ngModel)]="mantenimientoSeleccionado ? mantenimientoSeleccionado.fecha_completado : nuevoMantenimiento.fecha_completado"
+                                   name="fecha_completado" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="cerrarModal()" [disabled]="cargando">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" (click)="guardarMantenimiento()" [disabled]="cargando">
+                    <span *ngIf="cargando" class="spinner-border spinner-border-sm me-2"></span>
+                    {{ mantenimientoSeleccionado ? 'Actualizar' : 'Registrar' }} Mantenimiento
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Overlay para modal -->
+<div class="modal-backdrop fade show" *ngIf="mostrarModal" (click)="cerrarModal()"></div>
