@@ -1,0 +1,238 @@
+<!-- Componente principal de la aplicación -->
+<div class="app-container">
+    <!-- Barra de navegación superior -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="fas fa-car me-2"></i>
+                Sistema de Alquiler de Vehículos
+            </a>
+            <div class="d-flex align-items-center" *ngIf="estaAutenticado">
+                <span class="navbar-text me-3">
+                    <i class="fas fa-user me-1"></i>
+                    {{ usuarioActual?.username || 'Usuario' }}
+                </span>
+                <button class="btn btn-outline-light btn-sm" (click)="cerrarSesion()">
+                    <i class="fas fa-sign-out-alt me-1"></i>
+                    Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenedor principal -->
+    <div class="main-container" *ngIf="estaAutenticado">
+ <!-- Barra lateral -->
+<div class="sidebar bg-dark" [class.collapsed]="sidebarCollapsed">
+    <div class="sidebar-header py-3">
+        <button class="toggle-sidebar" (click)="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h5 class="text-white">Johan Rent-Car</h5>
+    </div>
+    <ul class="sidebar-menu">
+        <li>
+            <a href="#" [class.active]="seccionActual === 'dashboard'" 
+               (click)="cambiarSeccion('dashboard'); $event.preventDefault()">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Menu Principal</span>
+            </a>
+        </li>
+        <li>
+            <a href="#" [class.active]="seccionActual === 'vehiculos'" 
+               (click)="cambiarSeccion('vehiculos'); $event.preventDefault()">
+                <i class="fas fa-car"></i>
+                <span>Vehículos</span>
+            </a>
+        </li>
+        <li>
+            <a href="#" [class.active]="seccionActual === 'clientes'" 
+               (click)="cambiarSeccion('clientes'); $event.preventDefault()">
+                <i class="fas fa-users"></i>
+                <span>Clientes</span>
+            </a>
+        </li>
+        <li>
+            <a href="#" [class.active]="seccionActual === 'contratos'" 
+               (click)="cambiarSeccion('contratos'); $event.preventDefault()">
+                <i class="fas fa-file-contract"></i>
+                <span>Contratos</span>
+            </a>
+        </li>
+        <li>
+            <a href="#" [class.active]="seccionActual === 'pagos'" 
+               (click)="cambiarSeccion('pagos'); $event.preventDefault()">
+                <i class="fas fa-money-bill-wave"></i>
+                <span>Pagos</span>
+            </a>
+        </li>
+        <li>
+            <a href="#" [class.active]="seccionActual === 'mantenimientos'" 
+               (click)="cambiarSeccion('mantenimientos'); $event.preventDefault()">
+                <i class="fas fa-tools"></i>
+                <span>Mantenimientos</span>
+            </a>
+        </li>
+        <li>
+            <a href="#" [class.active]="seccionActual === 'reportes'" 
+               (click)="cambiarSeccion('reportes'); $event.preventDefault()">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reportes</span>
+            </a>
+        </li>
+    </ul>
+</div>
+
+        <!-- Área de contenido -->
+        <div class="content-area" [class.expanded]="sidebarCollapsed">
+            <!-- Sección Dashboard -->
+            <div *ngIf="seccionActual === 'dashboard'" class="section-content fade-in">
+                <div class="section-header mb-4">
+                    <h4 class="text-dark fw-bold">Dashboard del Sistema</h4>
+                    <p class="text-muted">Resumen general y estadísticas del sistema de alquiler</p>
+                </div>
+
+                <!-- Tarjetas de estadísticas -->
+                <div class="row g-3 mb-4">
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card stats-card bg-primary text-white h-100" 
+                             (click)="navegarDesdeDashboard('vehiculos')">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="stats-label opacity-75">Vehículos Disponibles</div>
+                                        <div class="stats-value fw-bold">{{ estadisticas.vehiculosDisponibles }}</div>
+                                    </div>
+                                    <div class="stats-icon">
+                                        <i class="fas fa-car fa-2x opacity-75"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card stats-card bg-success text-white h-100"
+                             (click)="navegarDesdeDashboard('contratos')">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="stats-label opacity-75">Contratos Activos</div>
+                                        <div class="stats-value fw-bold">{{ estadisticas.contratosActivos }}</div>
+                                    </div>
+                                    <div class="stats-icon">
+                                        <i class="fas fa-file-contract fa-2x opacity-75"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card stats-card bg-info text-white h-100"
+                             (click)="navegarDesdeDashboard('pagos')">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="stats-label opacity-75">Ingresos del Mes</div>
+                                        <div class="stats-value fw-bold">${{ (estadisticas.ingresosMes || 0) | number }}</div>
+                                    </div>
+                                    <div class="stats-icon">
+                                        <i class="fas fa-dollar-sign fa-2x opacity-75"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card stats-card bg-warning text-white h-100"
+                             (click)="navegarDesdeDashboard('mantenimientos')">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="stats-label opacity-75">Mantenimientos Pendientes</div>
+                                        <div class="stats-value fw-bold">{{ estadisticas.mantenimientosPendientes }}</div>
+                                    </div>
+                                    <div class="stats-icon">
+                                        <i class="fas fa-tools fa-2x opacity-75"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actividad Reciente -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0 text-dark">Actividad Reciente</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-striped">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th scope="col">Fecha</th>
+                                                <th scope="col">Tipo</th>
+                                                <th scope="col">Descripción</th>
+                                                <th scope="col">Usuario</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let actividad of actividadReciente">
+                                                <td>{{ actividad.fecha | date:'short' }}</td>
+                                                <td>
+                                                    <span [class]="'badge ' + actividad.claseBadge">
+                                                        {{ actividad.tipo }}
+                                                    </span>
+                                                </td>
+                                                <td>{{ actividad.descripcion }}</td>
+                                                <td>{{ actividad.usuario }}</td>
+                                            </tr>
+                                            <tr *ngIf="actividadReciente.length === 0">
+                                                <td colspan="4" class="text-center text-muted py-3">
+                                                    No hay actividad reciente para mostrar
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Otras secciones -->
+            <div *ngIf="seccionActual === 'vehiculos'" class="section-content fade-in">
+                <app-gestion-vehiculos></app-gestion-vehiculos>
+            </div>
+
+            <div *ngIf="seccionActual === 'clientes'" class="section-content fade-in">
+                <app-gestion-clientes></app-gestion-clientes>
+            </div>
+
+            <div *ngIf="seccionActual === 'contratos'" class="section-content fade-in">
+                <app-gestion-contratos></app-gestion-contratos>
+            </div>
+
+            <div *ngIf="seccionActual === 'pagos'" class="section-content fade-in">
+                <app-gestion-pagos></app-gestion-pagos>
+            </div>
+
+            <div *ngIf="seccionActual === 'mantenimientos'" class="section-content fade-in">
+                <app-gestion-mantenimientos></app-gestion-mantenimientos>
+            </div>
+
+            <div *ngIf="seccionActual === 'reportes'" class="section-content fade-in">
+                <app-reportes></app-reportes>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Componente de Login -->
+<app-login *ngIf="!estaAutenticado" (loginExitoso)="onLoginExitoso($event)"></app-login>
