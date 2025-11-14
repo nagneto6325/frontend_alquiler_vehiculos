@@ -1,0 +1,72 @@
+/**
+ * Estilos para el componente de gestión de clientes
+ */
+
+.gestion-clientes {
+    animation: fadeIn 0.3s ease-in;
+}
+
+/* Estados de texto */
+.text-muted {
+    color: #6c757d !important;
+}
+
+.fst-italic {
+    font-style: italic;
+}
+
+/* Badges informativos */
+.badge.bg-info {
+    background-color: #17a2b8 !important;
+    font-size: 0.7em;
+    font-family: monospace;
+}
+
+/* Responsive para tabla */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    .btn-group-sm .btn {
+        padding: 0.2rem 0.4rem;
+    }
+    
+    .badge {
+        font-size: 0.65rem;
+    }
+}
+
+/* Mejoras visuales para modal */
+.modal-content {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 1px solid #dee2e6;
+}
+
+.modal-title {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.form-control:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
